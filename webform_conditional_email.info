@@ -1,0 +1,8 @@
+name = Webform Conditional Email
+description = Provides different email depending on the value submitted.
+core = 7.x
+package = Webform
+dependencies[] = webform
+
+files[] = webform_conditional_email.pages.inc
+
