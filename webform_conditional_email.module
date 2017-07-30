@@ -1,7 +1,6 @@
 <?php
-
 /**
- * Stylesheet name token
+ * Webform conditional email
  * @file
  */
 include_once 'webform_conditional_email.pages.inc';
