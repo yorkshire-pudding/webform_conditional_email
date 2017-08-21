@@ -28,4 +28,4 @@ Usage - Manual
 
  * Multiple conditional rules can be possible through the same configuration
  
- * Multiple values can be also validate using the same rule.
+ * Multiple values can also be validate using the same rule.

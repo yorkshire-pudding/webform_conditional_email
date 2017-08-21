@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Webform conditional email
  * @file
@@ -277,16 +278,8 @@ function webform_conditional_email_webform_client_form_submit(&$form, &$form_sta
   // Check if user is submitting as a draft.
   $is_draft = (int) !empty($form_state['save_draft']);
 
-  // To maintain time and user information, load the existing submission.
-  // If a draft is deleted while a user is working on completing it, $sid will
-  // exist, but webform_get_submission() will not find the draft. So, make a new
-  // submission.
+
   if ($sid && $submission = webform_get_submission($node->webform['nid'], $sid)) {
-    // Merge with new submission data. The + operator maintains numeric keys.
-    // This maintains existing data with just-submitted data when a user resumes
-    // a submission previously saved as a draft.
-    // Remove any existing data on this and previous pages. If components are hidden, they may
-    // be in the $submission->data but absent entirely from $new_data;
     $page_map = webform_get_conditional_sorter($node)->getPageMap();
     for ($page_nr = 1; $page_nr <= $form_state['webform']['page_num']; $page_nr++) {
       $submission->data = array_diff_key($submission->data, $page_map[$page_nr]);
@@ -348,13 +341,14 @@ function webform_conditional_email_webform_client_form_submit(&$form, &$form_sta
   }
   // Check if this form is sending an email.
   if (!$is_draft && !$form_state['values']['details']['finished']) {
-    $emails = $node->webform['emails'];
-    //$operators = _webform_conditional_confirmation_conditional_operators(); function not exists in this module
+    $emails = &$form['#node']->webform['emails'];
     $operators = _webform_conditional_email_conditional_operators();
+
     foreach ($emails as $condition_id => $email) {
       $rules = webform_conditional_email_message_load($node, $email['eid']);
       if (isset($rules->nid)) {
         $conditionals = $rules->conditionals;
+
         // Matches must match number of conditionals in order to pass.
         $matches = 0;
 
@@ -368,83 +362,17 @@ function webform_conditional_email_webform_client_form_submit(&$form, &$form_sta
             }
           }
         }
-
         // If we have a matched this message, update the settings and return.
         if ($matches != count($conditionals)) {
           unset($form['#node']->webform['emails'][$condition_id]);
         }
       }
     }
+
     $node = $form['#node'];
 
     drupal_static_reset('webform_get_submission');
     $submission = webform_get_submission($node->webform['nid'], $sid);
     webform_submission_send_mail($node, $submission);
-  }
-
-  // Strip out empty tags added by WYSIWYG editors if needed.
-  $message = strlen(trim(strip_tags($node->webform['confirmation']))) > 0;
-
-  // Check confirmation and redirect_url fields.
-  $redirect = NULL;
-  $redirect_url = trim($node->webform['redirect_url']);
-  if (isset($form['actions']['draft']['#value']) && $form_state['values']['op'] == $form['actions']['draft']['#value']) {
-    $message = t('Submission saved. You may return to this form later and it will restore the current values.');
-  }
-  elseif ($is_draft) {
-    // No redirect needed. No confirmation message needed.
-    $message = FALSE;
-  }
-  else {
-    // Clear _SESSION for anonymous user after submission.
-    if (isset($_SESSION['webform_submission'][$sid])) {
-      unset($_SESSION['webform_submission'][$sid]);
-    }
-    if (!empty($form_state['values']['details']['finished'])) {
-      $message = t('Submission updated.');
-      $redirect = "node/{$node->nid}/submission/$sid";
-    }
-    elseif (!empty($node->webform['confirmation_block'])) {
-      $message = FALSE;
-      // Webform was submitted in a block and the confirmation message is to be
-      // displayed in the block.
-      $_SESSION['webform_confirmation'][$node->nid] = array(
-        'sid' => $sid,
-        'confirmation_page' => $redirect_url == '<confirmation>',
-      );
-      drupal_page_is_cacheable(FALSE);
-    }
-    elseif ($redirect_url == '<none>') {
-      // No redirect needed. Show a confirmation message if there is one.
-    }
-    elseif ($redirect_url == '<confirmation>') {
-      // No confirmation message needed because it will be shown on the
-      // confirmation page.
-      $message = FALSE;
-      $query = array('sid' => $sid);
-      if ((int) $user->uid === 0) {
-        $query['token'] = webform_get_submission_access_token($submission);
-      }
-      $redirect = array('node/' . $node->nid . '/done', array('query' => $query));
-    }
-    else {
-      // Clean up the redirect URL, filter it for tokens and detect external
-      // domains. If the redirect is to an external URL, then don't show the
-      // confirmation message.
-      $redirect = webform_replace_url_tokens($redirect_url, $node, $submission);
-      if ($redirect[1]['#webform_external']) {
-        $message = FALSE;
-      }
-    }
-
-    // Show a message if manually set.
-    if (is_string($message)) {
-      drupal_set_message($message);
-    }
-    // If redirecting and we have a confirmation message, show it as a message.
-    elseif ($message) {
-      drupal_set_message(filter_xss(webform_replace_tokens($node->webform['confirmation'], $node, $submission, NULL, $node->webform['confirmation_format'])));
-    }
-    $form_state['redirect'] = $redirect;
   }
 }
