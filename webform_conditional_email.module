@@ -1,8 +1,9 @@
 <?php
 
 /**
- * Webform conditional email
  * @file
+ * Webform conditional email to extend email configuration for webform.
+ * 
  */
 include_once 'webform_conditional_email.pages.inc';
 
@@ -16,46 +17,46 @@ function _webform_conditional_email_conditional_operators() {
   $operators = array();
 
   $operators['='] = array(
-    'label' => t('Is one of'),
+    'label' => t('Is one of'), 
     'comparator' => function($input, $test) {
       return $input == $test;
     },
   );
 
   $operators['!='] = array(
-    'label' => t('Is not one of'),
+    'label' => t('Is not one of'), 
     'comparator' => function($input, $test) {
       return $input != $test;
     },
   );
   $operators['<'] = array(
-    'label' => t('Less than'),
+    'label' => t('Less than'), 
     'comparator' => function($input, $test) {
       return $input < $test;
     },
   );
   $operators['<='] = array(
-    'label' => t('Less than, or equal to'),
+    'label' => t('Less than, or equal to'), 
     'comparator' => function($input, $test) {
       return $input <= $test;
     },
   );
   $operators['>'] = array(
-    'label' => t('Greater than'),
+    'label' => t('Greater than'), 
     'comparator' => function($input, $test) {
       return $input > $test;
     },
   );
 
   $operators['>='] = array(
-    'label' => t('Greater than, or equal to'),
+    'label' => t('Greater than, or equal to'), 
     'comparator' => function($input, $test) {
       return $input >= $test;
     },
   );
 
   $operators['LIKE'] = array(
-    'label' => t('Contains'),
+    'label' => t('Contains'), 
     'comparator' => function($input, $test) {
       return strpos($input, $test) !== FALSE;
     },
@@ -86,9 +87,7 @@ function webform_conditional_email_message_load($node, $condition_id = NULL) {
 
   // If condition_id is set, just return settings for the specified message.
   if ($condition_id) {
-    $defaults = $query->condition('condition_id', $condition_id)
-      ->execute()
-      ->fetchObject();
+    $defaults = $query->condition('condition_id', $condition_id)->execute()->fetchObject();
     if ($defaults->config)
       $defaults->config = unserialize($defaults->config);
     if ($defaults->conditionals)
@@ -145,7 +144,7 @@ function webform_conditional_email_message_delete($nid, $condition_id) {
 /**
  * Test a webform field value against a conditional.
  * @param string $input_value
- * @param (Array) $conditional 
+ * @param Array $conditional 
  * @return bool
  */
 function _webform_conditional_email_test_match($input_value, $conditional, $operators) {
