@@ -8,13 +8,13 @@
 /**
  * Get the node webform conditional components.
  *
- * @param stdClass $node
+ * @param $node 
  *   Node object.
  *
  * @return array
  *   Array of conditional components.
  */
-function _webform_conditional_email_get_conditional_components(stdClass $node) {
+function _webform_conditional_email_get_conditional_components($node) {
   if (!isset($node->webform) || empty($node->webform['components'])) {
     return array();
   }
@@ -37,7 +37,7 @@ function _webform_conditional_email_get_conditional_components(stdClass $node) {
  */
 function _webform_conditional_email_conditional_operators_options() {
   $operators = _webform_conditional_email_conditional_operators();
-  foreach ($operators as $key => &$operator) {
+  foreach ($operators as &$operator) {
     $operator = $operator['label'];
   }
 
