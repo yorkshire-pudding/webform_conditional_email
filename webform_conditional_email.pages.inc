@@ -8,7 +8,7 @@
 /**
  * Get the node webform conditional components.
  *
- * @param $node 
+ * @param object $node
  *   Node object.
  *
  * @return array
@@ -51,9 +51,9 @@ function _webform_conditional_email_conditional_operators_options() {
  *   Fieldset id.
  * @param object $node
  *   Webform node object.
- * @param array $conditional_components
+ * @param (Array) $conditional_components
  *   Webform conditional component array for node.
- * @param array $conditional_operators
+ * @param (Array) $conditional_operators
  *   WCC conditional operators options array.
  * @param object $wcc
  *   Webform conditional confirmation object.
@@ -114,9 +114,9 @@ function webform_conditional_email_edit_confirmation_form_validate($form, &$form
 /**
  * Add conditional to the form.
  *
- * @param array $form
+ * @param (Array) $form
  *   Form API array.
- * @param array $form_state
+ * @param (Array) $form_state
  *   Form state.
  */
 function _webform_conditional_email_edit_confirmation_form_add_conditional($form, &$form_state) {
@@ -126,17 +126,15 @@ function _webform_conditional_email_edit_confirmation_form_add_conditional($form
     return;
   }
 
-  $form_state['conditionals'] ++;
+  $form_state['conditionals']++;
   $form_state['rebuild'] = TRUE;
 }
 
 /**
  * Add conditional AJAX callback.
  *
- * @param array $form
- *   Form API array.
- * @param array $form_state
- *   Form state.
+ * @param (Array) $form
+ * @param (Array) $form_state
  */
 function _webform_conditional_email_edit_confirmation_form_add_conditional_callback($form, &$form_state) {
   return $form['conditionals'];
