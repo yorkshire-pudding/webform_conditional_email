@@ -51,9 +51,9 @@ function _webform_conditional_email_conditional_operators_options() {
  *   Fieldset id.
  * @param object $node
  *   Webform node object.
- * @param Array $conditional_components
+ * @param array $conditional_components
  *   Webform conditional component array for node.
- * @param Array $conditional_operators
+ * @param array $conditional_operators
  *   WCC conditional operators options array.
  * @param object $wcc
  *   Webform conditional confirmation object.
@@ -114,9 +114,9 @@ function webform_conditional_email_edit_confirmation_form_validate($form, &$form
 /**
  * Add conditional to the form.
  *
- * @param Array $form
+ * @param array $form
  *   Form API array.
- * @param Array $form_state
+ * @param array $form_state
  *   Form state.
  */
 function _webform_conditional_email_edit_confirmation_form_add_conditional($form, &$form_state) {
@@ -133,8 +133,10 @@ function _webform_conditional_email_edit_confirmation_form_add_conditional($form
 /**
  * Add conditional AJAX callback.
  *
- * @param Array $form
- * @param Array $form_state
+ * @param array $form
+ * Form array for Ajax callback
+ * @param array $form_state
+ * Form state for Ajax callback
  */
 function _webform_conditional_email_edit_confirmation_form_add_conditional_callback($form, &$form_state) {
   return $form['conditionals'];

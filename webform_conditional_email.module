@@ -148,7 +148,7 @@ function webform_conditional_email_message_delete($nid, $condition_id) {
  * Test a webform field value against a conditional.
  * @param string $input_value
  * Input value from match
- * @param Array $conditional 
+ * @param array $conditional 
  * Condition from match
  * @return bool
  */
