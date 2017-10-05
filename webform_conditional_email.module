@@ -232,8 +232,7 @@ function webform_conditional_email_form_webform_email_edit_form_alter(&$form, &$
 }
 
 /**
- * Implementation hook_form_alter() for webform_client_form.
- * 
+ * Implements hook_form_FORMID_alter().
  */
 function webform_conditional_email_form_alter($form, &$form_state, $form_id) {
   if (strpos($form_id, 'webform_client_form_') === 0) {
