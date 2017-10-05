@@ -127,7 +127,7 @@ function webform_conditional_email_message_save($rule) {
     drupal_write_record('webform_conditional_email', $rule);
   }
   else {
-    drupal_write_record('webform_conditional_email', $rule, 
+    drupal_write_record('webform_conditional_email', $rule,
       array('nid', 'condition_id', 'delta'));
   }
 
@@ -146,11 +146,12 @@ function webform_conditional_email_message_delete($nid, $condition_id) {
 
 /**
  * Test a webform field value against a conditional.
- * 
+ *
  * @param string $input_value
  *   Input value from match.
  * @param array $conditional
  *   Condition from match.
+ * 
  * @return bool
  *   On valid match return TRUE else FALSE.
  */
@@ -231,7 +232,8 @@ function webform_conditional_email_form_webform_email_edit_form_alter(&$form, &$
 }
 
 /**
- * Implementation hook_form_alter() for webform_client_form.
+ * Implementation hook_form_alter() for 
+ * webform_client_form.
  */
 function webform_conditional_email_form_alter($form, &$form_state, $form_id) {
   if (strpos($form_id, 'webform_client_form_') === 0) {

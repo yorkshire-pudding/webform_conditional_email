@@ -119,7 +119,7 @@ function webform_conditional_email_edit_confirmation_form_validate($form, &$form
  * @param array $form_state
  *   Form state.
  */
-function _webform_conditional_email_edit_confirmation_form_add_conditional($form, &$form_state) {
+function _webform_conditional_email_edit_confirmation_form_add_conditional(array $form, array &$form_state) {
   $n = $form_state['conditionals'];
   if ($form_state['values']['conditionals']['conditional_values_' . $n] === '') {
     form_error($form['conditionals'][$n]['conditional_values_' . $n], t('Check the last condition before adding a new one.'));
