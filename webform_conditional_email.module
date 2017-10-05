@@ -17,47 +17,47 @@ function _webform_conditional_email_conditional_operators() {
   $operators = array();
 
   $operators['='] = array(
-    'label' => t('Is one of'), 
-    'comparator' => function($input, $test) {
+    'label' => t('Is one of'),
+    'comparator' => function ($input, $test) {
       return $input == $test;
     },
   );
 
   $operators['!='] = array(
-    'label' => t('Is not one of'), 
-    'comparator' => function($input, $test) {
+    'label' => t('Is not one of'),
+    'comparator' => function ($input, $test) {
       return $input != $test;
     },
   );
   $operators['<'] = array(
-    'label' => t('Less than'), 
-    'comparator' => function($input, $test) {
+    'label' => t('Less than'),
+    'comparator' => function ($input, $test) {
       return $input < $test;
     },
   );
   $operators['<='] = array(
-    'label' => t('Less than, or equal to'), 
-    'comparator' => function($input, $test) {
+    'label' => t('Less than, or equal to'),
+    'comparator' => function ($input, $test) {
       return $input <= $test;
     },
   );
   $operators['>'] = array(
-    'label' => t('Greater than'), 
-    'comparator' => function($input, $test) {
+    'label' => t('Greater than'),
+    'comparator' => function ($input, $test) {
       return $input > $test;
     },
   );
 
   $operators['>='] = array(
-    'label' => t('Greater than, or equal to'), 
-    'comparator' => function($input, $test) {
+    'label' => t('Greater than, or equal to'),
+    'comparator' => function ($input, $test) {
       return $input >= $test;
     },
   );
 
   $operators['LIKE'] = array(
-    'label' => t('Contains'), 
-    'comparator' => function($input, $test) {
+    'label' => t('Contains'),
+    'comparator' => function ($input, $test) {
       return strpos($input, $test) !== FALSE;
     },
   );
@@ -88,11 +88,13 @@ function webform_conditional_email_message_load($node, $condition_id = NULL) {
   // If condition_id is set, just return settings for the specified message.
   if ($condition_id) {
     $defaults = $query->condition('condition_id', $condition_id)->execute()->fetchObject();
-    if ($defaults->config)
+    if ($defaults->config){
       $defaults->config = unserialize($defaults->config);
-    if ($defaults->conditionals)
+    }
+    if ($defaults->conditionals){
       $defaults->conditionals = unserialize($defaults->conditionals);
-
+    }
+    
     return $defaults;
   }
 
@@ -125,7 +127,8 @@ function webform_conditional_email_message_save($rule) {
     drupal_write_record('webform_conditional_email', $rule);
   }
   else {
-    drupal_write_record('webform_conditional_email', $rule, array('nid', 'condition_id', 'delta'));
+    drupal_write_record('webform_conditional_email', $rule, 
+      array('nid', 'condition_id', 'delta'));
   }
 
   return $rule->condition_id;
@@ -144,7 +147,9 @@ function webform_conditional_email_message_delete($nid, $condition_id) {
 /**
  * Test a webform field value against a conditional.
  * @param string $input_value
+ * Input value from match
  * @param Array $conditional 
+ * Condition from match
  * @return bool
  */
 function _webform_conditional_email_test_match($input_value, $conditional, $operators) {
