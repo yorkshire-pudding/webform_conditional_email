@@ -3,8 +3,8 @@
 /**
  * @file
  * Webform conditional email to extend email configuration for webform.
- * 
  */
+
 include_once 'webform_conditional_email.pages.inc';
 
 /**
@@ -88,13 +88,13 @@ function webform_conditional_email_message_load($node, $condition_id = NULL) {
   // If condition_id is set, just return settings for the specified message.
   if ($condition_id) {
     $defaults = $query->condition('condition_id', $condition_id)->execute()->fetchObject();
-    if ($defaults->config){
+    if ($defaults->config) {
       $defaults->config = unserialize($defaults->config);
     }
-    if ($defaults->conditionals){
+    if ($defaults->conditionals) {
       $defaults->conditionals = unserialize($defaults->conditionals);
     }
-    
+
     return $defaults;
   }
 
@@ -146,13 +146,15 @@ function webform_conditional_email_message_delete($nid, $condition_id) {
 
 /**
  * Test a webform field value against a conditional.
+ * 
  * @param string $input_value
- * Input value from match
- * @param array $conditional 
- * Condition from match
+ *   Input value from match.
+ * @param array $conditional
+ *   Condition from match.
  * @return bool
+ *   On valid match return TRUE else FALSE.
  */
-function _webform_conditional_email_test_match($input_value, $conditional, $operators) {
+function _webform_conditional_email_test_match($input_value, array $conditional, $operators) {
   if (!isset($operators[$conditional['operator']])) {
     watchdog('webform_conditional_email', 'Operator for %op not found.', array('%op' => $conditional['operator']));
     return FALSE;
@@ -229,9 +231,9 @@ function webform_conditional_email_form_webform_email_edit_form_alter(&$form, &$
 }
 
 /**
- * Implementation of hook_form_alter() for webform_client_form.
+ * Implementation hook_form_alter() for webform_client_form.
  */
-function webform_conditional_email_form_alter(&$form, &$form_state, $form_id) {
+function webform_conditional_email_form_alter($form, &$form_state, $form_id) {
   if (strpos($form_id, 'webform_client_form_') === 0) {
     array_unshift($form['#submit'], 'webform_conditional_email_webform_client_form_submit');
     array_unshift($form['#submit'], 'webform_client_form_pages');

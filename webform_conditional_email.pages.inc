@@ -61,7 +61,7 @@ function _webform_conditional_email_conditional_operators_options() {
  * @return array
  *   Form API array.
  */
-function _webform_conditional_email_conditional_fieldset($n, $node, $conditional_components, $conditional_operators, $wcc = NULL) {
+function _webform_conditional_email_conditional_fieldset($n, $node, array $conditional_components, array $conditional_operators, $wcc = NULL) {
   $defaults = array();
   if ($wcc) {
     $defaults = $wcc->conditionals;
@@ -134,11 +134,11 @@ function _webform_conditional_email_edit_confirmation_form_add_conditional($form
  * Add conditional AJAX callback.
  *
  * @param array $form
- * Form array for Ajax callback
+ *   Form array for Ajax callback.
  * @param array $form_state
- * Form state for Ajax callback
+ *   Form state for Ajax callback.
  */
-function _webform_conditional_email_edit_confirmation_form_add_conditional_callback($form, &$form_state) {
+function _webform_conditional_email_edit_confirmation_form_add_conditional_callback(array $form, array &$form_state) {
   return $form['conditionals'];
 }
 
