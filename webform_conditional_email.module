@@ -84,14 +84,14 @@ function webform_conditional_email_message_load($node, $condition_id = NULL) {
 
   // Load existing messsages.
   $query = db_select('webform_conditional_email', 'wcc')
-      ->fields('wcc')
-      ->condition('nid', $node->nid);
+    ->fields('wcc')
+    ->condition('nid', $node->nid);
 
   // If condition_id is set, just return settings for the specified message.
   if ($condition_id) {
     $defaults = $query->condition('condition_id', $condition_id)
-        ->execute()
-        ->fetchObject();
+      ->execute()
+      ->fetchObject();
     if ($defaults->config)
       $defaults->config = unserialize($defaults->config);
     if ($defaults->conditionals)
@@ -101,8 +101,8 @@ function webform_conditional_email_message_load($node, $condition_id = NULL) {
   }
 
   $result = $query->orderBy('conditional_weight', 'ASC')
-      ->orderBy('condition_id', 'ASC')
-      ->execute();
+    ->orderBy('condition_id', 'ASC')
+    ->execute();
 
   $records = array();
   while ($record = $result->fetchObject()) {
@@ -121,9 +121,9 @@ function webform_conditional_email_message_save($rule) {
   $rule->config = serialize($rule->config);
   $rule->conditionals = serialize($rule->conditionals);
   $next_id_query = db_select('webform_conditional_email', 'rwce')
-      ->fields('rwce', array('delta'))
-      ->condition('nid', $rule->nid)
-      ->condition('condition_id', $rule->condition_id);
+    ->fields('rwce', array('delta'))
+    ->condition('nid', $rule->nid)
+    ->condition('condition_id', $rule->condition_id);
   $rule->delta = $next_id_query->execute()->fetchField();
   if (!$rule->delta) {
     drupal_write_record('webform_conditional_email', $rule);
@@ -140,21 +140,16 @@ function webform_conditional_email_message_save($rule) {
  */
 function webform_conditional_email_message_delete($nid, $condition_id) {
   db_delete('webform_conditional_email')
-      ->condition('nid', $nid)
-      ->condition('condition_id', $condition_id)
-      ->execute();
+    ->condition('nid', $nid)
+    ->condition('condition_id', $condition_id)
+    ->execute();
 }
 
 /**
  * Test a webform field value against a conditional.
- *
  * @param string $input_value
- *   Webform field input value.
- * @param array $conditional
- *   WCE conditional array.
- *
+ * @param array $conditional 
  * @return bool
- *   Matched.
  */
 function _webform_conditional_email_test_match($input_value, $conditional, $operators) {
   if (!isset($operators[$conditional['operator']])) {
@@ -233,7 +228,7 @@ function webform_conditional_email_form_webform_email_edit_form_alter(&$form, &$
 }
 
 /**
- * Implementation of hook_form_alter
+ * Implementation of hook_form_alter().
  */
 function webform_conditional_email_form_alter(&$form, &$form_state, $form_id) {
   if (strpos($form_id, 'webform_client_form_') === 0) {
@@ -277,7 +272,6 @@ function webform_conditional_email_webform_client_form_submit(&$form, &$form_sta
   $sid = $form_state['values']['details']['sid'] ? (int) $form_state['values']['details']['sid'] : NULL;
   // Check if user is submitting as a draft.
   $is_draft = (int) !empty($form_state['save_draft']);
-
 
   if ($sid && $submission = webform_get_submission($node->webform['nid'], $sid)) {
     $page_map = webform_get_conditional_sorter($node)->getPageMap();
