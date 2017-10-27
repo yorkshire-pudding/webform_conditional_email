@@ -237,7 +237,6 @@ function webform_conditional_email_form_webform_email_edit_form_alter(&$form, &$
 function webform_conditional_email_form_alter(&$form, &$form_state, $form_id) {
   if (strpos($form_id, 'webform_client_form_') === 0 || $form_id == 'webform_client_form') {
     array_unshift($form['#submit'], 'webform_conditional_email_webform_client_form_submit');
-    //$form['#submit'][] = 'webform_conditional_email_webform_client_form_submit';
   }
   elseif ($form_id == 'webform_email_delete_form') {
     $form['nid'] = array(
@@ -267,7 +266,7 @@ function webform_conditional_email_webform_client_form_submit(&$form, &$form_sta
   if (!$is_draft) {
     $emails = $form['#node']->webform['emails'];
     $operators = _webform_conditional_email_conditional_operators();
-    
+
     foreach ($emails as $condition_id => $email) {
       $rules = webform_conditional_email_message_load($node, $email['eid']);
       if (isset($rules->nid)) {
@@ -278,7 +277,7 @@ function webform_conditional_email_webform_client_form_submit(&$form, &$form_sta
         foreach ($conditionals as $conditional) {
           $data = $submitted_data[$node->webform['components'][$conditional['component']]['form_key']];
           // Loop through each data in case field is multivalued.
-          if(is_array($data)){
+          if (is_array($data)) {
             foreach ($data as $input_value) {
               if (_webform_conditional_email_test_match($input_value, $conditional, $operators)) {
                 $matches++;
@@ -286,11 +285,11 @@ function webform_conditional_email_webform_client_form_submit(&$form, &$form_sta
               }
             }
           }
-          else{
+          else {
             if (_webform_conditional_email_test_match($data, $conditional, $operators)) {
               $matches++;
               break;
-            }             
+            }
           }
         }
         // If we have a matched this message, update the settings and return.

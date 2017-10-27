@@ -61,7 +61,7 @@ function _webform_conditional_email_conditional_operators_options() {
  * @return array
  *   Form API array.
  */
-function _webform_conditional_email_conditional_fieldset($n, $node, $conditional_components, $conditional_operators, $wce = NULL) {
+function _webform_conditional_email_conditional_fieldset($n, $node, array $conditional_components, array $conditional_operators, $wce = NULL) {
   $defaults = array();
   if ($wce) {
     $defaults = $wce->conditionals;
@@ -119,7 +119,7 @@ function webform_conditional_email_edit_confirmation_form_validate($form, &$form
  * @param array $form_state
  *   Form state.
  */
-function _webform_conditional_email_edit_confirmation_form_add_conditional($form, &$form_state) {
+function _webform_conditional_email_edit_confirmation_form_add_conditional(array $form, array &$form_state) {
   $n = $form_state['conditionals'];
   if ($form_state['values']['conditionals']['conditional_values_' . $n] === '') {
     form_error($form['conditionals'][$n]['conditional_values_' . $n], t('Check the last condition before adding a new one.'));
@@ -138,7 +138,7 @@ function _webform_conditional_email_edit_confirmation_form_add_conditional($form
  * @param array $form_state
  *   Form state for Ajax callback.
  */
-function _webform_conditional_email_edit_confirmation_form_add_conditional_callback($form, &$form_state) {
+function _webform_conditional_email_edit_confirmation_form_add_conditional_callback(array $form, array &$form_state) {
   return $form['conditionals'];
 }
 
@@ -164,7 +164,7 @@ function webform_conditional_email_edit_confirmation_form_submit($form, &$form_s
   $rule->condition_id = $form_state['values']['eid'];
   $rule->conditional_weight = 0;
   $rule->conditionals = $conditionals;
-  $rule->config = array();  
+  $rule->config = array();
 
   $condition_id = webform_conditional_email_message_save($rule);
   if ($condition_id) {
