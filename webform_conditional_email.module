@@ -255,7 +255,6 @@ function webform_conditional_email_form_alter(&$form, &$form_state, $form_id) {
  * Submit handler; Load our conditional confirmation messages if required.
  */
 function webform_conditional_email_webform_client_form_submit(&$form, &$form_state) {
-  global $user;
   $submitted_data = $form_state['values']['submitted'];
 
   $node = $form['#node'];
