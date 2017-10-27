@@ -81,8 +81,8 @@ function webform_conditional_email_message_load($node, $condition_id = NULL) {
   }
 
   // Load existing messsages.
-  $query = db_select('webform_conditional_email', 'wcc')
-    ->fields('wcc')
+  $query = db_select('webform_conditional_email', 'wce')
+    ->fields('wce')
     ->condition('nid', $node->nid);
 
   // If condition_id is set, just return settings for the specified message.
@@ -234,20 +234,10 @@ function webform_conditional_email_form_webform_email_edit_form_alter(&$form, &$
 /**
  * Implements hook_form_FORMID_alter().
  */
-function webform_conditional_email_form_alter($form, &$form_state, $form_id) {
-  if (strpos($form_id, 'webform_client_form_') === 0) {
+function webform_conditional_email_form_alter(&$form, &$form_state, $form_id) {
+  if (strpos($form_id, 'webform_client_form_') === 0 || $form_id == 'webform_client_form') {
     array_unshift($form['#submit'], 'webform_conditional_email_webform_client_form_submit');
-    array_unshift($form['#submit'], 'webform_client_form_pages');
-    $form['#submit'] = array_unique($form['#submit']);
-    $key = array_search('webform_client_form_submit', $form['#submit']);
-    unset($form['#submit'][$key]);
-  }
-  elseif ($form_id == 'webform_client_form') {
-    array_unshift($form['#submit'], 'webform_conditional_email_webform_client_form_submit');
-    array_unshift($form['#submit'], 'webform_client_form_pages');
-    $form['#submit'] = array_unique($form['#submit']);
-    $key = array_search('webform_client_form_submit', $form['#submit']);
-    unset($form['#submit'][$key]);
+    //$form['#submit'][] = 'webform_conditional_email_webform_client_form_submit';
   }
   elseif ($form_id == 'webform_email_delete_form') {
     $form['nid'] = array(
@@ -266,98 +256,41 @@ function webform_conditional_email_form_alter($form, &$form_state, $form_id) {
  * Submit handler; Load our conditional confirmation messages if required.
  */
 function webform_conditional_email_webform_client_form_submit(&$form, &$form_state) {
-  module_load_include('inc', 'webform', 'includes/webform.submissions');
-  module_load_include('inc', 'webform', 'includes/webform.components');
   global $user;
-  if (empty($form_state['save_draft']) && empty($form_state['webform_completed'])) {
-    return;
-  }
+  $submitted_data = $form_state['values']['submitted'];
+
   $node = $form['#node'];
-  $sid = $form_state['values']['details']['sid'] ? (int) $form_state['values']['details']['sid'] : NULL;
   // Check if user is submitting as a draft.
   $is_draft = (int) !empty($form_state['save_draft']);
 
-  if ($sid && $submission = webform_get_submission($node->webform['nid'], $sid)) {
-    $page_map = webform_get_conditional_sorter($node)->getPageMap();
-    for ($page_nr = 1; $page_nr <= $form_state['webform']['page_num']; $page_nr++) {
-      $submission->data = array_diff_key($submission->data, $page_map[$page_nr]);
-    }
-    $submission->data = webform_submission_data($node, $form_state['values']['submitted']) + $submission->data;
-  }
-  else {
-    // Create a new submission object.
-    $submission = webform_submission_create($node, $user, $form_state);
-    // Since this is a new submission, a new sid is needed.
-    $sid = NULL;
-  }
-
-  // Save draft state, and for drafts, save the current page (if clicking next)
-  // or the previous page (if not) as the last valid page.
-  $submission->is_draft = $is_draft;
-  $submission->highest_valid_page = 0;
-  if ($is_draft) {
-    $submission->highest_valid_page = end($form_state['clicked_button']['#parents']) == 'next' && $form_state['values']['op'] != '__AUTOSAVE__' ? $form_state['webform']['page_num'] : $form_state['webform']['page_num'] - 1;
-    // If they're anonymous, save the session ID so we can tidy up later.
-    if (!$user->uid) {
-      $submission->session_id = session_id();
-    }
-  }
-
-  // If there is no data to be saved (such as on a multipage form with no fields
-  // on the first page), process no further. Submissions with no data cannot
-  // be loaded from the database as efficiently, so we don't save them at all.
-  if (empty($submission->data)) {
-    return;
-  }
-
-  // Save the submission to the database.
-  if (!$sid) {
-    // No sid was found thus insert it in the dataabase.
-    $form_state['values']['details']['sid'] = $sid = webform_submission_insert($node, $submission);
-    $form_state['values']['details']['is_new'] = TRUE;
-
-    // Set a cookie including the server's submission time. The cookie expires
-    // in the length of the interval plus a day to compensate for timezones.
-    $tracking_mode = webform_variable_get('webform_tracking_mode');
-    if ($tracking_mode === 'cookie' || $tracking_mode === 'strict') {
-      $cookie_name = 'webform-' . $node->nid;
-      $time = REQUEST_TIME;
-      $params = session_get_cookie_params();
-      setcookie($cookie_name . '[' . $time . ']', $time, $time + $node->webform['submit_interval'] + 86400, $params['path'], $params['domain'], $params['secure'], $params['httponly']);
-    }
-
-    // Save session information about this submission for anonymous users,
-    // allowing them to access or edit their submissions.
-    if (!$user->uid) {
-      $_SESSION['webform_submission'][$form_state['values']['details']['sid']] = $node->nid;
-    }
-  }
-  else {
-    // Sid was found thus update the existing sid in the database.
-    webform_submission_update($node, $submission);
-    $form_state['values']['details']['is_new'] = FALSE;
-  }
   // Check if this form is sending an email.
-  if (!$is_draft && !$form_state['values']['details']['finished']) {
-    $emails = &$form['#node']->webform['emails'];
+  if (!$is_draft) {
+    $emails = $form['#node']->webform['emails'];
     $operators = _webform_conditional_email_conditional_operators();
-
+    
     foreach ($emails as $condition_id => $email) {
       $rules = webform_conditional_email_message_load($node, $email['eid']);
       if (isset($rules->nid)) {
         $conditionals = $rules->conditionals;
-
         // Matches must match number of conditionals in order to pass.
         $matches = 0;
 
         foreach ($conditionals as $conditional) {
-          $data = $submission->data[$conditional['component']];
+          $data = $submitted_data[$node->webform['components'][$conditional['component']]['form_key']];
           // Loop through each data in case field is multivalued.
-          foreach ($data as $input_value) {
-            if (_webform_conditional_email_test_match($input_value, $conditional, $operators)) {
+          if(is_array($data)){
+            foreach ($data as $input_value) {
+              if (_webform_conditional_email_test_match($input_value, $conditional, $operators)) {
+                $matches++;
+                break;
+              }
+            }
+          }
+          else{
+            if (_webform_conditional_email_test_match($data, $conditional, $operators)) {
               $matches++;
               break;
-            }
+            }             
           }
         }
         // If we have a matched this message, update the settings and return.
@@ -366,11 +299,5 @@ function webform_conditional_email_webform_client_form_submit(&$form, &$form_sta
         }
       }
     }
-
-    $node = $form['#node'];
-
-    drupal_static_reset('webform_get_submission');
-    $submission = webform_get_submission($node->webform['nid'], $sid);
-    webform_submission_send_mail($node, $submission);
   }
 }
